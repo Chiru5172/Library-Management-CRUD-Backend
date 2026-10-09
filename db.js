@@ -3,25 +3,37 @@ const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database(
     "./database/library.db",
     function(error) {
+
         if (error) {
-            console.log("Database connection error:", error.message);
+            console.log(
+                "Database connection error:",
+                error.message
+            );
         } else {
-            console.log("SQLite database connected");
+            console.log(
+                "SQLite database connected"
+            );
         }
     }
 );
 
+
 db.serialize(function() {
+
+    // STUDENT TABLE
 
     db.run(`
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT NOT NULL UNIQUE,
             name TEXT NOT NULL,
             class TEXT NOT NULL,
-            photo TEXT,
-            video TEXT
+            mobile TEXT NOT NULL
         )
     `);
+
+
+    // BOOK TABLE
 
     db.run(`
         CREATE TABLE IF NOT EXISTS books (
@@ -32,6 +44,9 @@ db.serialize(function() {
             year INTEGER
         )
     `);
+
+
+    // LIBRARY TABLE
 
     db.run(`
         CREATE TABLE IF NOT EXISTS library (
@@ -50,5 +65,6 @@ db.serialize(function() {
     `);
 
 });
+
 
 module.exports = db;

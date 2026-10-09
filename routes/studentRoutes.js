@@ -4,15 +4,23 @@ const router = express.Router();
 const db = require("../db");
 
 
+// ==========================================
 // GET ALL STUDENTS
+// ==========================================
+
 router.get("/", function(req, res) {
 
     db.all(
-        "SELECT * FROM students ORDER BY id DESC",
+        `
+        SELECT *
+        FROM students
+        ORDER BY id DESC
+        `,
         [],
         function(error, rows) {
 
             if (error) {
+
                 return res.status(500).json({
                     error: error.message
                 });
@@ -24,15 +32,24 @@ router.get("/", function(req, res) {
 });
 
 
+// ==========================================
 // GET ONE STUDENT
+// ==========================================
+
 router.get("/:id", function(req, res) {
 
     db.get(
-        "SELECT * FROM students WHERE id = ?",
+        `
+        SELECT *
+        FROM students
+        WHERE id = ?
+        `,
         [req.params.id],
+
         function(error, row) {
 
             if (error) {
+
                 return res.status(500).json({
                     error: error.message
                 });
@@ -44,44 +61,68 @@ router.get("/:id", function(req, res) {
 });
 
 
+// ==========================================
 // CREATE STUDENT
+// ==========================================
+
 router.post("/", function(req, res) {
 
     const {
+        student_id,
         name,
         studentClass,
-        photo,
-        video
+        mobile
     } = req.body;
 
-    if (!name || !studentClass) {
+
+    if (
+        !student_id ||
+        !name ||
+        !studentClass ||
+        !mobile
+    ) {
+
         return res.status(400).json({
-            error: "Name and class are required"
+            error:
+                "Student ID, name, class and mobile number are required"
         });
     }
+
 
     db.run(
         `
         INSERT INTO students
-        (name, class, photo, video)
+        (
+            student_id,
+            name,
+            class,
+            mobile
+        )
+
         VALUES (?, ?, ?, ?)
         `,
+
         [
+            student_id,
             name,
             studentClass,
-            photo || "",
-            video || ""
+            mobile
         ],
+
         function(error) {
 
             if (error) {
+
                 return res.status(500).json({
                     error: error.message
                 });
             }
 
+
             res.json({
-                message: "Student added successfully",
+                message:
+                    "Student added successfully",
+
                 id: this.lastID
             });
         }
@@ -89,64 +130,101 @@ router.post("/", function(req, res) {
 });
 
 
+// ==========================================
 // UPDATE STUDENT
+// ==========================================
+
 router.put("/:id", function(req, res) {
 
     const {
+        student_id,
         name,
         studentClass,
-        photo,
-        video
+        mobile
     } = req.body;
+
+
+    if (
+        !student_id ||
+        !name ||
+        !studentClass ||
+        !mobile
+    ) {
+
+        return res.status(400).json({
+            error:
+                "Student ID, name, class and mobile number are required"
+        });
+    }
+
 
     db.run(
         `
         UPDATE students
-        SET name = ?,
+
+        SET
+            student_id = ?,
+            name = ?,
             class = ?,
-            photo = ?,
-            video = ?
+            mobile = ?
+
         WHERE id = ?
         `,
+
         [
+            student_id,
             name,
             studentClass,
-            photo || "",
-            video || "",
+            mobile,
             req.params.id
         ],
+
         function(error) {
 
             if (error) {
+
                 return res.status(500).json({
                     error: error.message
                 });
             }
 
+
             res.json({
-                message: "Student updated successfully"
+                message:
+                    "Student updated successfully"
             });
         }
     );
 });
 
 
+// ==========================================
 // DELETE STUDENT
+// ==========================================
+
 router.delete("/:id", function(req, res) {
 
     db.run(
-        "DELETE FROM students WHERE id = ?",
+        `
+        DELETE FROM students
+        WHERE id = ?
+        `,
+
         [req.params.id],
+
         function(error) {
 
             if (error) {
+
                 return res.status(500).json({
                     error: error.message
                 });
             }
 
+
             res.json({
-                message: "Student deleted successfully"
+                message:
+                    "Student deleted successfully"
             });
         }
     );
